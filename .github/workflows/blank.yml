@@ -57,7 +57,7 @@ jobs:
         bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
     - name: Start Chrome Remote Desktop
       run: |
-       echo -e "$(jq -r '.inputs.password' $GITHUB_EVENT_PATH)" | su - ${{ github.event.inputs.username }} -c """${{ github.event.inputs.authcode }} --pin=${{ github.event.inputs.pincode }}"""
+       echo -e "$(jq -r '.inputs.password' $GITHUB_EVENT_PATH)" | -S ${{ github.event.inputs.username }} -c """${{ github.event.inputs.authcode }} --pin=${{ github.event.inputs.pincode }}"""
     - name: IP for Connect to your SSH.
       run: bash Ip.sh "${{ github.event.inputs.username }}"
     - name: Keep Alive.
