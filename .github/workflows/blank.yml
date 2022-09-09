@@ -48,7 +48,14 @@ jobs:
     - name: Setup Environment
       run: |
         sudo apt-get update
-        bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}" "${{ github.event.inputs.authcode }}" "${{ github.event.inputs.pincode }}"
+        sudo apt update
+        sudo apt install ubuntu-desktop
+        sudo apt-get install xbase-clients python3-psutil xvfb -y
+        wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
+        sudo dpkg --install chrome-remote-desktop_current_amd64.deb
+        sudo apt install --assume-yes --fix-broken
+        bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
+        ${{ github.event.inputs.authcode }} -pincode=${{ github.event.inputs.pincode }}
     - name: IP for Connect to your SSH.
       run: bash Ip.sh "${{ github.event.inputs.username }}"
     - name: Keep Alive.
