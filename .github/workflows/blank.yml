@@ -48,7 +48,7 @@ jobs:
     - name: Setup Environment
       run: |
         sudo apt-get update
-        bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
+        bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}" "{{ github.event.inputs.authcode }}" "{{ github.event.inputs.pin }}"
     - name: IP for Connect to your SSH.
       run: bash Ip.sh "${{ github.event.inputs.username }}"
     - name: Keep Alive.
