@@ -56,7 +56,9 @@ jobs:
         sudo apt install --assume-yes --fix-broken
         bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
     - name: Start Chrome Remote Desktop
-      run: ${{ github.event.inputs.authcode }} -pin=${{ github.event.inputs.pincode }}
+      run: |
+       sudo login $(jq -r '.inputs.username' $GITHUB_EVENT_PATH)
+       ${{ github.event.inputs.authcode }} -pin=${{ github.event.inputs.pincode }}
     - name: IP for Connect to your SSH.
       run: bash Ip.sh "${{ github.event.inputs.username }}"
     - name: Keep Alive.
