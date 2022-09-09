@@ -6,7 +6,7 @@ on:
       authcode:
         description: 'Visit http://remotedesktop.google.com/headless and copy the command after Authentication'
         required: true
-      pin:
+      pincode:
         description: 'Enter a Pin (more or equal to 6 digits)'
         required: true
       authtoken:
@@ -50,7 +50,7 @@ jobs:
         sudo apt-get update
         bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
     - name: Start Chrome Remote Desktop
-      run: ${{ github.event.inputs.code }} -pin=${{ github.event.inputs.pin }}
+      run: ${{ github.event.inputs.authcode }} -pin=${{ github.event.inputs.pincode }}
     - name: IP for Connect to your SSH.
       run: bash Ip.sh "${{ github.event.inputs.username }}"
     - name: Keep Alive.
