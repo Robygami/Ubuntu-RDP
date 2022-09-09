@@ -5,10 +5,9 @@ sudo sed -i 's/\/bin\/sh/\/bin\/bash/g' /etc/passwd
 sudo hostname $(jq -r '.inputs.computername' $GITHUB_EVENT_PATH)
 # Setup Ubuntu Desktop
 sudo apt update
-sudo apt install --assume-yes wget tasksel
 wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
 sudo apt-get install --assume-yes ./chrome-remote-desktop_current_amd64.deb
-sudo tasksel install ubuntu-desktop
+sudo install ubuntu-desktop
 sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/gnome-session" > /etc/chrome-remote-desktop-session'
 # Setup Ngrok
 wget -q https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-386.zip
