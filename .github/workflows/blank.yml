@@ -7,21 +7,21 @@ on:
         description: 'Visit http://remotedesktop.google.com/headless and copy the command after Authentication'
         required: true
       pincode:
-        description: 'Enter a Pin (more or equal to 6 digits)'
+        description: 'Enter a PIN (6 digits or more)'
         required: true
       authtoken:
         description: 'NGROK AUTH TOKEN'
         required: true
       computername:
-        description: 'MACHINE NAME'
+        description: 'Machine name'
         default: 'ubuntu'
         required: true
       username:
-        description: 'USERNAME'
+        description: 'Username'
         default: 'user'
         required: true
       password:
-        description: 'USER PASSWORD'
+        description: 'User password'
         default: 'root'
         required: true
 
@@ -34,7 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3.0.2
-    - name: Mask Code & Pin.
+
+    - name: Mask secrets
       run: |
         _Token=$(jq -r '.inputs.authtoken' $GITHUB_EVENT_PATH)
         _CName=$(jq -r '.inputs.computername' $GITHUB_EVENT_PATH)
@@ -45,20 +46,34 @@ jobs:
         echo NGROK_TOKEN="$_Token" >> $GITHUB_ENV
         echo ComputerName="$_CName" >> $GITHUB_ENV
         echo Password="$_Pass" >> $GITHUB_ENV
-    - name: Setup Environment
+
+    - name: Setup environment and install CRD
       run: |
-        sudo apt-get update
         sudo apt update
-        sudo apt install ubuntu-desktop
-        sudo apt-get install xbase-clients python3-psutil xvfb -y
+        sudo apt install xfce4 xfce4-goodies -y
+        sudo apt install xbase-clients python3-psutil xvfb wget -y
         wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
-        sudo dpkg --install chrome-remote-desktop_current_amd64.deb
-        sudo apt install --assume-yes --fix-broken
-        bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
+        sudo dpkg -i chrome-remote-desktop_current_amd64.deb || sudo apt install -f -y
+
+    - name: Run setup script
+      run: |
+        if [ -f Setup.sh ]; then
+          bash Setup.sh "${{ env.NGROK_TOKEN }}" "${{ env.ComputerName }}" "${{ github.event.inputs.username }}" "${{ env.Password }}"
+        else
+          echo "⚠️ File Setup.sh tidak ditemukan!"
+        fi
+
     - name: Start Chrome Remote Desktop
       run: |
-       echo -e "$(jq -r '.inputs.password' $GITHUB_EVENT_PATH)" | -S ${{ github.event.inputs.username }} -c """${{ github.event.inputs.authcode }} --pin=${{ github.event.inputs.pincode }}"""
-    - name: IP for Connect to your SSH.
-      run: bash Ip.sh "${{ github.event.inputs.username }}"
-    - name: Keep Alive.
-      run: ping 127.0.0.1 > null
+        su - ${{ github.event.inputs.username }} -c '${{ github.event.inputs.authcode }} --pin=${{ github.event.inputs.pincode }}'
+
+    - name: Show public IP for SSH
+      run: |
+        if [ -f Ip.sh ]; then
+          bash Ip.sh "${{ github.event.inputs.username }}"
+        else
+          curl ifconfig.me
+        fi
+
+    - name: Keep alive
+      run: ping 127.0.0.1 > /dev/null
